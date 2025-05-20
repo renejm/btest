@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  gpt-service:
+    build:
+      context: ./gpt-service
+      dockerfile: Dockerfile
+    container_name: gpt-service
+    ports:
+      - "3000:3000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/summarize-loads"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - ./logs:/var/log/gpt
+    networks:
+      - billor-network
+
+networks:
+  billor-network:
+    driver: bridge
