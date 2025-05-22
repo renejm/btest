@@ -24,7 +24,7 @@ export class SummaryService {
       throw new Error(`Load with ID ${loadId} not found`);
     }
 
-    // Remove old summary (if exists)
+    // Remove old summary (if any)
     if (load.summary) {
       await this.summaryRepo.remove(load.summary);
     }

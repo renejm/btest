@@ -11,7 +11,6 @@ export class SummarizeController {
       throw new BadRequestException('Body must contain an array of loads');
     }
 
-    // Type guard to ensure each load has the required properties
     const isValidLoad = (
       load: Record<string, unknown>,
     ): load is {

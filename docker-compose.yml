@@ -1,35 +1,64 @@
-version: '3.8'
-
 services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=btest_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - btest-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   gpt-service:
     build:
       context: ./gpt-service
       dockerfile: Dockerfile
     container_name: gpt-service
     ports:
-      - '3000:3000'
+      - '3001:3000'
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:3000/summarize-loads']
-      interval: 30s
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
     volumes:
       - ./logs:/var/log/gpt
     networks:
-      - billor-network
+      - btest-network
+
   automation-service:
     build:
       context: ./automation-service
+      dockerfile: Dockerfile
     container_name: automation-service
+    ports:
+      - '3000:3000'
     depends_on:
+      postgres:
+        condition: service_healthy
       gpt-service:
         condition: service_healthy
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=btest_db
     volumes:
       - ./logs:/var/log/automation
     networks:
-      - billor-network
+      - btest-network
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3000/metrics']
       interval: 30s
@@ -37,5 +66,8 @@ services:
       retries: 3
 
 networks:
-  billor-network:
+  btest-network:
     driver: bridge
+
+volumes:
+  postgres_data:

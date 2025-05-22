@@ -7,23 +7,28 @@ import { SummaryModule } from './summary/summary.module';
 import { AutomationController } from './automation/automation.controller';
 import { LoadScraperService } from './load-scraper/load-scraper.service';
 import { MetricsController } from './metrics/metrics.controller';
+import { LoadInsightsController } from './insights/load-insights.controller';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'postgres', // Nome do serviço no docker-compose
+      host: 'postgres',
       port: 5432,
       username: 'postgres',
       password: 'postgres',
-      database: 'billor_db',
-      synchronize: true, // ❗ apenas em dev, gera o schema automaticamente
+      database: 'btest_db',
+      synchronize: true, // dev only!
       autoLoadEntities: true,
     }),
     TypeOrmModule.forFeature([Driver, Load, Summary]),
     SummaryModule,
   ],
-  controllers: [AutomationController, MetricsController],
+  controllers: [
+    AutomationController,
+    MetricsController,
+    LoadInsightsController,
+  ],
   providers: [LoadScraperService],
 })
 export class AppModule {}

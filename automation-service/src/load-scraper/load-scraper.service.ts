@@ -32,14 +32,14 @@ export class LoadScraperService {
     const loads: any[] = [];
 
     try {
-      // Portal fictício 1: JB Hunt
+      // Fictional loadboard portal 1: JB Hunt
       await page.goto('https://www.jbhunt.com/loadboard/load-board/map');
-      await new Promise((res) => setTimeout(res, 3000)); // mock de scraping
+      await new Promise((res) => setTimeout(res, 3000));
       loads.push(...this.generateFakeLoads('JB Hunt'));
 
-      // Portal fictício 2: Landstar
+      // Fictional loadboard portal 2: Landstar
       await page.goto('https://www.landstaronline.com/loadspublic');
-      await new Promise((res) => setTimeout(res, 3000)); // mock de scraping
+      await new Promise((res) => setTimeout(res, 3000));
       loads.push(...this.generateFakeLoads('Landstar'));
     } catch (err) {
       this.logger.error('Error during scraping:', err);
@@ -58,7 +58,6 @@ export class LoadScraperService {
     };
 
     for (const item of finalLoads as FakeLoad[]) {
-      // Fetch or create the driver
       let driver = await this.driverRepo.findOne({
         where: { name: item.provider },
       });
@@ -80,7 +79,6 @@ export class LoadScraperService {
     const storedLoads: StoredLoad[] = [];
 
     for (const item of finalLoads) {
-      // Fetch or create driver
       let driver = await this.driverRepo.findOne({
         where: { name: item.provider },
       });

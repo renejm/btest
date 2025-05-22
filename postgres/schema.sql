@@ -39,7 +39,3 @@ SELECT
     s.created_at AS summarized_at
 FROM loads l
 JOIN summaries s ON l.id = s.load_id;
-
--- Example query: Top 5 most valuable loads with summaries
--- (can be reused in application layer)
--- SELECT * FROM load_summary_view ORDER BY price DESC LIMIT 5;

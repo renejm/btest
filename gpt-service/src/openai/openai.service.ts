@@ -6,6 +6,7 @@ export class OpenAiService {
   private readonly openai: OpenAI;
 
   constructor() {
+    //console.log('OpenAI Key:', process.env.OPENAI_API_KEY);
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
@@ -18,21 +19,37 @@ export class OpenAiService {
       price: number;
       eta: string;
     }[],
-  ): Promise<{ summary: string; insights: string[] }> {
+  ): Promise<{
+    summaries: { origin: string; destination: string; summary: string }[];
+  }> {
     const prompt = this.buildPrompt(loads);
 
     const response = await this.openai.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
-      model: 'gpt-4', // ou outro conforme disponível
+      model: 'gpt-4',
     });
 
     const content = response.choices[0]?.message?.content || '';
-    const [summary, ...insights] = content.split('\n').filter(Boolean);
 
-    return {
-      summary,
-      insights,
-    };
+    // Expects a response in the format:
+    // 1. TX to CA: Summary...
+    // 2. NY to FL: Summary...
+    const lines = content.split('\n').filter((line) => line.trim());
+
+    const summaries = lines.map((line, index) => {
+      const match = line.match(/^\d+\.\s*(.+?)\s*to\s*(.+?):\s*(.+)$/i);
+      if (!match) {
+        return {
+          origin: loads[index]?.origin ?? '',
+          destination: loads[index]?.destination ?? '',
+          summary: line.trim(),
+        };
+      }
+      const [, origin, destination, summary] = match;
+      return { origin, destination, summary };
+    });
+
+    return { summaries };
   }
 
   private buildPrompt(
@@ -43,14 +60,14 @@ export class OpenAiService {
       eta: string;
     }[],
   ): string {
-    const intro =
-      'Given the following list of truck loads, summarize and give insights:\n';
-    const details = loads
-      .map(
-        (load, i) =>
-          `${i + 1}. Origin: ${load.origin}, Destination: ${load.destination}, Price: ${load.price}, ETA: ${load.eta}`,
-      )
-      .join('\n');
-    return `${intro}${details}`;
+    let prompt =
+      'For each of the following truck loads, return a brief summary in the format:\n\n';
+    prompt += '1. ORIGIN to DESTINATION: Summary text...\n\n';
+
+    loads.forEach((load, index) => {
+      prompt += `${index + 1}. ${load.origin} to ${load.destination}, price: ${load.price}, ETA: ${load.eta}\n`;
+    });
+
+    return prompt;
   }
 }
