@@ -3,9 +3,13 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 interface LoadSummary {
-  id: number;
+  load_id: number;
+  origin: string;
+  destination: string;
   price: number;
+  eta: Date;
   summary_text: string;
+  summarized_at: Date;
 }
 
 @Controller('load-insights')
