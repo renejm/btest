@@ -1,6 +1,18 @@
-# BTEST - Solutions Engineering Test Implementation
+# BTEST - End-to-End Backend Architecture with NestJS, OpenAI GPT, and Web Automation
 
-This repository contains the implementation of the solution for the technical challenge for the Solutions Engineer position. The system consists of a Docker-based microservices architecture with integration to language models (GPT), web automation, and PostgreSQL database.
+This repository showcases a complete backend solution built with NestJS and Docker, developed as part of a real-world technical challenge for a Solutions Engineer position.
+
+The system is composed of two containerized microservices:
+- A web automation service using Puppeteer to scrape data from load boards
+- A summarization service powered by the OpenAI GPT API to extract insights from freight data
+
+It features:
+- Asynchronous communication between services via REST
+- PostgreSQL data persistence with materialized views and index optimization
+- Healthchecks, Prometheus metrics, and container orchestration with Docker Compose
+- E2E testing with Jest and Supertest
+
+Although originally developed as a technical test, this project is now part of my public portfolio and demonstrates my experience with real-world backend engineering, infrastructure, observability, and LLM integration.
 
 ## Architecture
 
